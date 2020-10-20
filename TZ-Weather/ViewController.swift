@@ -104,17 +104,17 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         guard let location: CLLocationCoordinate2D = manager.location?.coordinate else { return }
         manager.stopUpdatingLocation()
         
-        NetworkService.shared.getRequest(lat: location.latitude, lon: location.longitude) {
+        NetworkService.shared.getRequest(lat: location.latitude, lon: location.longitude) { [weak self] in
             if NetworkService.shared.weatherData == nil {
-                self.loadingView.isHidden = false
+                self?.loadingView.isHidden = false
             } else {
-                self.collectionView.reloadData()
-                self.tableView.reloadData()
-                self.getCurrentWeather()
-                self.getHourlyIcons()
-                self.getDailyIcons()
-                self.addOtherWeatherData()
-                self.loadingView.isHidden = true
+                self?.collectionView.reloadData()
+                self?.tableView.reloadData()
+                self?.getCurrentWeather()
+                self?.getHourlyIcons()
+                self?.getDailyIcons()
+                self?.addOtherWeatherData()
+                self?.loadingView.isHidden = true
 
             }
         }
