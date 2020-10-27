@@ -9,10 +9,10 @@ class NetworkService {
     var weatherData: WeatherData?
     
     func getRequest(lat: Double?, lon: Double?, comletion: @escaping () -> ()) {
-        self.sendRequest(latitude: lat, longitude: lon) { (data) in
+        self.sendRequest(latitude: lat, longitude: lon) { [weak self] (data) in
             do {
                 let json = try JSONDecoder().decode(WeatherData.self, from: data)
-                self.weatherData = json
+                self?.weatherData = json
                 DispatchQueue.main.async {
                     comletion()
                 }
