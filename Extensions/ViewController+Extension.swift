@@ -41,7 +41,7 @@ extension ViewController: UIScrollViewDelegate {
 
 extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let temp = NetworkService.shared.weatherData?.hourly
+        let temp = self.weatherData?.hourly
         
         return temp?.count ?? 0
     }
@@ -59,8 +59,8 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
 extension ViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let currentTemp = NetworkService.shared.weatherData?.daily.removeFirst()
-        let temp = NetworkService.shared.weatherData?.daily
+        let currentTemp = self.weatherData?.daily.removeFirst()
+        let temp = self.weatherData?.daily
         self.minMaxTemperature = currentTemp
         
         return temp?.count ?? 0

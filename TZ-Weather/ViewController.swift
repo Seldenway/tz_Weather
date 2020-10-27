@@ -33,7 +33,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     var hourlyIconImages: [UIImage] = []
     var dailyIconImages: [UIImage] = []
     var minMaxTemperature: Daily?
-    
+    var weatherData: WeatherData?
   
     //MARK: - let
     private let locationManager = CLLocationManager()
@@ -64,19 +64,19 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         self.maxTemperatureLabel.text = "\(Int(self.minMaxTemperature?.temp.max ?? Double()))º"
         self.minTemperatureLabel.text = "\(Int(self.minMaxTemperature?.temp.min ?? Double()))º"
         
-        if let temp = NetworkService.shared.weatherData?.current.temp {
+        if let temp = self.weatherData?.current.temp {
             self.currentTemperatureLabel.text = "\(Int(temp))º"
         }
         
-        if let description = NetworkService.shared.weatherData?.current.weather?.first?.description {
+        if let description = self.weatherData?.current.weather?.first?.description {
             self.weatherDescriptionLabel.text = "\(description.capitalizingFirstLetter())"
         }
         
-        self.timezoneLabel.text = NetworkService.shared.weatherData?.timezone
+        self.timezoneLabel.text = self.weatherData?.timezone
     }
     
     private func getHourlyIcons() {
-        guard let iconsArray = NetworkService.shared.weatherData?.hourly else {  return }
+        guard let iconsArray = self.weatherData?.hourly else {  return }
         for element in iconsArray {
             for item in element.weather {
                 self.hourlyIconImages.append(UIImage(named: item.icon) ?? UIImage())
@@ -85,7 +85,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     private func getDailyIcons() {
-        guard let iconsArray = NetworkService.shared.weatherData?.daily else { return }
+        guard let iconsArray = self.weatherData?.daily else { return }
         for element in iconsArray {
             for item in element.weather {
                 self.dailyIconImages.append(UIImage(named: item.icon) ?? UIImage())
@@ -104,24 +104,21 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         guard let location: CLLocationCoordinate2D = manager.location?.coordinate else { return }
         manager.stopUpdatingLocation()
         
-        NetworkService.shared.getRequest(lat: location.latitude, lon: location.longitude) { [weak self] in
-            if NetworkService.shared.weatherData == nil {
-                self?.loadingView.isHidden = false
-            } else {
-                self?.collectionView.reloadData()
-                self?.tableView.reloadData()
-                self?.getCurrentWeather()
-                self?.getHourlyIcons()
-                self?.getDailyIcons()
-                self?.addOtherWeatherData()
-                self?.loadingView.isHidden = true
-
-            }
+        NetworkService.shared.getRequest(lat: location.latitude, lon: location.longitude) { [weak self] (data) in
+            self?.weatherData = data
+            self?.collectionView.reloadData()
+            self?.tableView.reloadData()
+            self?.getCurrentWeather()
+            self?.getHourlyIcons()
+            self?.getDailyIcons()
+            self?.addOtherWeatherData()
+            self?.loadingView.isHidden = true
+            
         }
     }
     
     func collectionViewConfig(_ cell: CustomCollectionViewCell, _ indexPath: IndexPath) {
-        let temp = NetworkService.shared.weatherData?.hourly[indexPath.item]
+        let temp = self.weatherData?.hourly[indexPath.item]
         
         if let weatherTemp = temp?.temp {
             cell.temperatureLabel.text = "\(Int(weatherTemp))º"
@@ -146,7 +143,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     func tableViewConfig(_ cell: CustomTableViewCell, _ indexPath: IndexPath) {
-        let temp = NetworkService.shared.weatherData?.daily[indexPath.row]
+        let temp = self.weatherData?.daily[indexPath.row]
         
         if let weatherTemp = temp?.temp {
             cell.dayTemperature.text = "\(Int(weatherTemp.day))º"
@@ -177,7 +174,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     }
     
     private func addOtherWeatherData() {
-        let temp = NetworkService.shared.weatherData?.current
+        let temp = self.weatherData?.current
         
         self.sunriseLabel.text = "\(self.getSunriseAndSunset(temp?.sunrise ?? Int()))"
         self.sunsetLabel.text = "\(self.getSunriseAndSunset(temp?.sunset ?? Int()))"

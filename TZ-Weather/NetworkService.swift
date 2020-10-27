@@ -6,15 +6,13 @@ class NetworkService {
     static let shared = NetworkService()
     private init() {}
     
-    var weatherData: WeatherData?
     
-    func getRequest(lat: Double?, lon: Double?, comletion: @escaping () -> ()) {
+    func getRequest(lat: Double?, lon: Double?, comletion: @escaping (WeatherData) -> ()) {
         self.sendRequest(latitude: lat, longitude: lon) { (data) in
             do {
                 let json = try JSONDecoder().decode(WeatherData.self, from: data)
-                self.weatherData = json
                 DispatchQueue.main.async {
-                    comletion()
+                    comletion(json)
                 }
             } catch let error {
                 print(error.localizedDescription)
