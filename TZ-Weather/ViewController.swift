@@ -50,6 +50,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         
         NotificationCenter.default.addObserver(self, selector: #selector(updateWeatherAfterLaunch), name: Notification.Name.updateWeather, object: nil)
         
+        print("Hello World")
     }
     
     //MARK: - Flow functions
